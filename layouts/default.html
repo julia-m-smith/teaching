@@ -28,9 +28,17 @@
     <header class="page-header" role="banner">
       <h1 class="project-name">{{ page.title | default: site.title | default: site.github.repository_name }}</h1>
       <h2 class="project-tagline">{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>  
-      <a href="{{ site.buttons.back | default: https://julia-m-smith.github.io }}" class="btn">{{ site.buttons.back_title | default: "Home Page" }}</a>
-        {% endunless %}
-      {% endif %}
+      
+      <a href="index" class="btn">Home</a>
+      <a href="teaching" class="btn">Teaching</a>
+      <a href="{{ site.buttons.zip | default: https://julia-m-smith.github.io/Smith_CV2025.pdf }}" class="btn">{{ site.buttons.zip_title | default: "View my CV" }}</a>
+      
+      <!-- <a href="{{ site.buttons.zip | default: https://julia-m-smith.github.io/Smith_CV2025.pdf }}" class="btn">{{ site.buttons.zip_title | default: "View my CV" }}</a>
+      <a href="{{ site.buttons.tar | default: https://scholar.google.com/citations?user=7Sy2fMYAAAAJ&hl=en&oi=ao}}" class="btn">site.buttons.tar_title | default: "Google Scholar"}}</a>
+      <a href="{{ site.buttons.hom | default: https://julia-m-smith.github.io}}" class="btn">site.buttons.hom_title | default: "Home"}}</a>
+      {% endunless %}
+      {% endif %} -->
+      
     </header>
 
     <main id="content" class="main-content" role="main">
