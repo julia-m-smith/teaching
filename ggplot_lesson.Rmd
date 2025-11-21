@@ -1,0 +1,180 @@
+---
+title: "ggplot lesson"
+output: html_document
+date: November 20, 2025
+editor_options: 
+  chunk_output_type: console
+---
+
+In this lesson, you will learn how to use ggplot2 to generate different kinds of plots and graphs. I've used one of R's built-in datasets for this upload so that everyone can have access to the data and play around with the code, but you can read in your own data and modify the existing code to make your own plots. 
+
+```{r read in}
+require(tidyverse)
+require(psych)
+require(ggplot2) # ggplot2 is included in tidyverse, so you don't actually need to load it if tidyverse is already loaded
+library(readr) #you can load both of these - readr will read in your .csv files with read_csv(), 
+library(haven) #and haven will read in your .sav files with read_sav()
+
+#I'll just get an existing R dataset for the demo. This dataset is about flowers - specifically, the sepal length, sepal width, petal length, and petal width for 50 flowers each from 3 species of iris.
+
+data("iris")
+
+```
+
+Below, I demonstrate how to make different types of graphs. Each type is in a different chunk. You can skip to the graph type you want. Just look down at the bottom of this pane, where the .rmd file meets the console pane. It should say "(Top Level)" or perhaps "Chunk 1: read in". If you click that, you will see all the types of graphs in this demo, and you can click the one you want. 
+
+```{r histograms}
+# To check the distribution of a continuous variable, such as sepal length
+
+iris %>% #this is the name of your dataset
+  ggplot(aes(Sepal.Length)) + #two things to note here. In ggplot, aes() is where you put the variables you want to plot. The first one will go on the x axis, the second on the y. Since histograms only take one variable, you'll just put one. The second thing is that after ggplot components, you use the "+" to add additional lines. 
+  geom_histogram() #This tells ggplot what type of plot you want to make, in this case a histogram.
+
+#Notice in the console that R doesn't love the binwidth on this graph. Binwidth refers to how many values on the x axis are included in each bar or "bin" of the histogram. 
+
+iris %>%
+  ggplot(aes(Sepal.Length)) +
+  geom_histogram(binwidth = .5) # This is how you set the binwidth to whatever width you want. Try a few different ones. Since values of Sepal.Length have one decimal, .1 gives you one bin for each value of Sepal.Length. 
+
+# Suppose you want to check the distributions of one variable based on another variable. For example, do some species of iris have short sepals that are occasionally long, while others have long sepals that are occasionally short? You can use facet_grid to see. 
+
+iris %>%
+  ggplot(aes(Sepal.Length)) +
+  geom_histogram(binwidth = .1) +
+  facet_grid(. ~ Species) 
+
+# Let's say we only want to compare setosa and versicolor irises. We can use filter in our plots just like we do in data cleaning and analysis
+iris %>%
+  filter(Species == "setosa" | Species == "versicolor") %>% # We can apply a filter before making the plot
+  ggplot(aes(Sepal.Length)) +
+  geom_histogram(binwidth = .1) +
+  facet_grid(. ~ Species)
+
+```
+
+```{r bar graphs}
+
+# Bar plots are useful for showing different means or summary values. Let's create a visual to show the different sepal lengths by species. 
+
+iris %>%
+  ggplot(aes(Species, Sepal.Length)) + 
+  geom_bar(stat = "identity") 
+
+# But wait! We are running into a problem. Why does our y-axis go all the way up to 300? Are some sepals 300 cm long? 
+
+# Actually it's not plotting the mean, but the sum, which can be misleading, especially if we have more of one species than another (in this case, we don't - but either way, we want our axes to make sense.)
+
+iris %>%
+  ggplot(aes(Species, Sepal.Length)) + 
+  geom_bar(stat = "summary", fun.y = "mean") # Here I've used "summary" instead of "identity" as the stat, and I've specified that the function to use on the y-axis should be the mean. Notice that the y axis makes a lot more sense now
+
+# Extras: add color based on specoes, and add axis labels:
+iris %>%
+  ggplot(aes(Species, Sepal.Length)) +
+  geom_bar(stat = "summary", fun.y = "mean", aes(fill = Species)) +
+  ylab("Sepal Length") +
+  xlab("Species") +
+  theme_minimal() # We can even add a theme if we want. Try different ones! If you delete "minimal" and press the tab key, you can see the options. 
+
+# With error bars 
+
+iris %>%
+  group_by(Species) %>%
+  dplyr::summarize(M = mean(Sepal.Length), #Notice here that when I use the function "summarize", I specify which one I mean. There are a few different "summarize" functions; I want the one from the "dplyr" package.
+            SD = sd(Sepal.Length),
+            N = n(),
+            SE = SD/sqrt(N),
+            Upper = M + 1.96 * SE,
+            Lower = M - 1.96 * SE) %>%
+  ggplot(aes(Species, M)) + #notice I am now using "M" on the y axis because I already calculated the mean sepal length
+  geom_bar(aes(fill = Species), stat = "identity", width = .5) + #notice I am using stat = "identity" for the same reason
+    labs(x = "Species", y = "Sepal Length") + 
+    geom_errorbar(aes(ymin = Lower, ymax = Upper), width = .05) + #these error bars represent the standard error of the mean
+  theme_classic() 
+```
+
+```{r boxplots, point and jitter plots, and violin plots} 
+
+# Let's plot the same data with a boxplot. 
+iris %>%
+  ggplot(aes(Species, Sepal.Length)) +
+  geom_boxplot() 
+
+# Now let's say we wanted to visualize the raw data on top of the boxplot
+iris %>%
+  ggplot(aes(Species, Sepal.Length)) +
+  geom_boxplot() +
+  geom_point(alpha = .3, aes(color = Species)) #and add color based on species - don't forget the "aes()"!
+
+#The points in the above graph are all in a straight line because each iris belongs to only one categorical species. But since it can be hard to see how many points are on top of each other this way, we can also apply a "jitter" to "shake up" where the points appear. 
+iris %>%
+  ggplot(aes(Species, Sepal.Length)) +
+  geom_boxplot() +
+  geom_jitter(alpha = .3, aes(color = Species)) #try changing the setting for "alpha". Hint: it ranges between 0 and 1. 
+
+  # Or we could represent the same data using a violin plot
+iris %>%
+  ggplot(aes(Species, Sepal.Length)) +
+  geom_violin(aes(color = Species, fill = Species)) # color is the outline, fill is the whole shape
+
+```
+
+```{r scatterplots}
+# Now let's take a look at data visualization for two variables that are both continuous. Let's see if flowers with longer sepals also tend to have wider petals. 
+
+iris %>%
+  ggplot(aes(Sepal.Length, Petal.Width)) +
+  geom_point()
+# Note that this tells us about the distribution, but that one point might represent one or multiple people. geom_jitter offsets the location of the points to give you an idea about how many participants occupy a space. 
+
+iris %>%
+  ggplot(aes(Sepal.Length, Petal.Width)) +
+  geom_jitter()
+
+# You can also get fancy by changing the alpha (transparency) and size of the points
+
+iris %>%
+  ggplot(aes(Sepal.Length, Petal.Width)) +
+  geom_jitter(alpha = .2, size = 3, aes(color = Species)) # You can even color the dots by a categorical variable such as species
+
+# Now let's add a trendline 
+iris %>%
+  ggplot(aes(Sepal.Length, Petal.Width)) +
+  geom_jitter(alpha = .2, size = 3, aes(color = Species)) +
+  geom_smooth(model = lm, se = T) # Set the se to TRUE or FALSE depending on whether you want the gray area indicating standard error. Setting "method = lm" instead of "model = lm" gives you a straight line.
+
+```
+
+
+```{r interactions plots} 
+
+# Now let's say you want to plot two continuous variables and one categorical variable. Maybe instead of just coloring the dots based on Species, you want trendlines based on Species so that you can see whether the relationship between sepal length and petal width is different for the different species. 
+
+iris %>%
+  ggplot(aes(Sepal.Length, Petal.Width, color = Species)) +
+  scale_color_manual(values = c("deeppink2", "mediumorchid3", "blue1")) + # If you want to set your own colors. You can use hex codes or you can use ggplot color names which you can find here: https://sape.inf.usi.ch/quick-reference/ggplot2/colour or by googling "ggplot palette". Make sure you have the right number of colors for your data. 
+  geom_jitter(alpha = .6, size = 2) +
+  geom_smooth(method = lm, se = F) +
+  xlab("Sepal Length") +
+  ylab("Petal Width") +
+  theme_minimal()
+
+```
+
+```{r additional points - recoding variables}
+#Here are some additional things you might want to do while making graphs. 
+#Let's say you have a variable that is coded with arbitrary numeric codes, like country: 1, 2, 3. You can recode with something like this:
+
+data$country <- recode(data$country, "1" = "United States",
+                            "2" = "Canada",
+                      "3" = "Mexico")
+
+#or, with the iris dataset, say you want the species names capitalized. You can do:
+iris$Species <- recode(iris$Species, "setosa" = "Setosa",
+                            "versicolor" = "Versicolor",
+                       "virginica" = "Virginica")
+
+
+
+
+```

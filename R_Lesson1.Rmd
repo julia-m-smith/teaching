@@ -1,0 +1,164 @@
+---
+title: "R Lesson 1: Reading in Data, Setting a Working Directory, Making a Project, and Basic Descriptives"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+Hello! Welcome to your first lesson in R! R is a open-source programming language, and that means that it is free for anyone to use. There's a lot of information and support out there, but since R has a very short name, Google searches can get convoluted. I hope I've explained everything you need in this lesson, but if you get stumped and need to search for answers, I recommend the search engine Rseek.org, because all the answers will be about R specifically. 
+
+R is really flexible, so technically, if we were computer programmers (and had infinite time), we could do everything we need to do in psychology just by typing code into the console box down below!
+
+Fortunately, we don't have to. Because R is open-source, people are always expanding and improving upon R, and making new "packages" for others to use. Packages are basically sets of functions that we can use to do different things in R. You'll see what I mean as we go on. 
+
+R already has several base functions and can already find a package for you on the internet and install it (as long as you have internet access). Let's try installing a package now. The first package we're going to use is called "yarrr" - this is a package that was made to accompany The Pirates Guide to R, a free ebook that you can read here: https://bookdown.org/ndphillips/YaRrr/. Feel free to use the book as a supplement to help you learn more things in R! 
+
+For now, we will install the package so we can use some of the datasets as a common reference point before we read in the data from your surveys. To do that, we can write our code directly in the console below, or we can make an R chunk in this notebook so that we can save our code for later. To make a chunk, we would go up to the green "insert" button at the top right of this window. Then, we would click "R". 
+
+```{r installing and using packages}
+# That gives us this chunk! Try inserting a chunk of your own right above this one. 
+
+# Now, why am I using so many hashtags? R will interpret everything inside this chunk as code to be run, UNLESS you start it with the #. So, when you want to make notes about what each of the codes do, use # to tell R that what you're about to type is just a note. 
+# OK, let's install the package.
+
+install.packages("yarrr") #Try running this code. To run it, place your cursor on this line. Now click "ctrl" and "enter" on a PC or "command" and "return" on a Mac.
+
+# You might see a blue loading bar. R is getting the package from the internet. If it says "package 'yarrr' successfully unpacked and MD5 sums checked, congrats! You just installed your first R package! 
+
+# But, just because a package is installed doesn't mean R is always using it. We need to load the package first. We need to tell R to look in our library for the package for THIS session. 
+
+library(yarrr) # Run this line to tell R we need the yarrr package. 
+
+# Notice that R is showing you right under this box and/or in the console what it's doing. You can clear or expand/collapse this output by clicking the top right corner of the white box below this chunk. Or, you can just scroll past the output.
+```
+
+Nice! You've just installed and loaded your first R package! Now, let's have a look at some data. The yarrr package has some datasets we can play around with, so you'll have an example for your own data. 
+
+```{r looking at data}
+# Let's look at a dataframe included in the yarrr package. 
+View(capture) # The "View" function lets us view the dataset. It will appear in the "Environment" to the right, and it will also appear as a tab. 
+
+# This is a dataset of ships captured by the pirates. Use the tabs at the top of the screen to look at the dataset. Notice the variables: the size of the ships, the number of cannons they have, etc. We can get a list of all the variables using the "names" command. 
+
+names(capture) # Notice that "View" is capitalized, but "names" isn't. R is case-sensitive, so try running this line:
+Names(capture) 
+# Notice that you get an error. If you find that R can't find your function, check the case first. Now, try typing "Names" with a capital N below. 
+
+
+# Notice that after you type it, R will come up with functions it recognizes and thinks you might need. You can press "enter" to take R's suggestion of "names" instead of "Names". 
+```
+
+Alright. Now that we have a dataset loaded, let's take a look at how to load your own datasets. If your data are in Qualtrics, go to Qualtrics and click on your survey. Click the "data and analysis" tab. 
+Now, click "Export & Import". Click "Export" because you are getting data from Qualtrics, not giving data to Qualtrics. 
+A dialogue box will come up, and you'll have the option of selecting what kind of file you want. Click "SPSS" since that is probably the simplest for now. You won't be able to open the file directly, because you don't have SPSS on your computer, but R can open the file. Click "Download". Now, if the file is in your "Downloads" folder, you probably don't want it to stay there. I recommend making a file folder somewhere on your computer where you save your datasets for your R practice. You can call it "R practice", "Sample Data", or some descriptive name for your project, like "Common Phrases" or "Prestigious Fields". Place your dataset in this folder. 
+
+Now it's time to read your file in R. First, we need to tell R where to find the file. We call the location where R looks for files the "working directory", but you need to tell R what the directory is. You can do that in code using the "setwd" function and typing the name of the directory (as in, the whole file name starting with C//User etc.). But if you're not sure of the full name or don't want to type it, an easier way is to go to the "session" tab at the top of RStudio, click "set working directory" and click "choose working directory". This will open up your files and you can choose the directory you want. Try it!
+
+But, what if you have multiple files in the same directory, and you don't want to set the directory every time you come back to the project? You can make an R project that will save your working directory for the whole project. That way, when you open R for Lesson 2, you won't have to set the working directory again. Since we know there are more R lessons to come, let's do this now. 
+
+WARNING: what you are about to do will close this file. Don't worry, you can open it back up again at any time by clicking the little yellow folder on the top left. In fact, if you click the black arrow, this file should be right at the top in your recent files. 
+
+Go to the top right where it says Project:(None). Click "New Project". If you get a prompt, click "Save". Click "Choose existing working directory" and navigate to your new folder where you saved your dataset. Click "OK" and open this file back up. See you on the other side!
+
+
+If you successfully created a new project, now at the top right where it did say "Project: (None)" it should say the name of your folder. Now you are in the right working directory, and in the pane to the right of this box, under the "Files" tab, you should see all the files that are in this folder, including your dataset. Neat!
+
+Now it's finally time to see your data! The easiest way to do this is to click on the dataset in the pane to the right and click "import dataset". You should see a preview of the dataset in the large box, and in the smaller box on the lower right, you will see a preview of the code you would use to read in the dataset. Copy that code. Now, you can click "import" and your data will come up in another window just like the ship data did before. Paste the code you copied in the box below so that later, instead of clicking the dataset, you can read it in easily just with the code. 
+
+```{r reading in your own data}
+# Paste code below:
+
+
+
+# Notice that your code says "library(haven)" or perhaps instead of haven it says another package. This is the package R used to read your file. If your data didn't load (sadness), it might be because this package is missing. If you're having trouble, try running:
+install.packages("haven") # and then 
+library(haven) 
+
+# Here is some code that reads in one of my datasets. Since you don't have this dataset on your computer, the code won't work. But try to find the analogies in your own code.
+library(readr) # This is the package R needs to read my file. 
+Codes <- read_csv("~/Research/Counterfactual Thinking/Data/Codes.csv") # Let me explain this line from left to right. "Codes" is the name I chose for my file. This is the name I'll use throughout the project to refer to this dataset. Feel free to choose whatever name you want for your dataset; my advice is to keep it pretty short so you don't have to type as much. After the name, you see an arrow <-. Whatever is left of that arrow is called a "Container" and whatever is right of the arrow is what is being put into that container. So the word "Codes" is just a container, and inside the container is my dataset. Now, R knows that whenever I say "Codes", what I really mean is "read my data located at "~/Research/Counterfactual Thinking/Data/Codes.csv" using the function "read_csv"." That's a lot to say! Good thing we can just use a container to make a shorthand.
+
+# The next line is:
+View(Codes) # Just like:
+View(capture) # from before. Try to run this code.
+
+# Uh oh. R says there is no object called "capture"! But we just saw it! This is because when we changed our working directory, we started a new R session. To get the capture data back, we just need to run the code again. We only have to install the package once, but now that we started a new session, we need to tell R we want to use the "yarrr" package, and we want to View the capture data. Try to type the commands below and see if you can get the "capture" data back. If you have trouble and want help, scroll down. 
+
+
+
+```
+
+Scroll down for help:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+# To tell R we need the yarrr package: 
+library(yarrr)
+# To get the capture dataset tab back:
+View(capture)
+```
+
+Great! Now we have two datasets to work with: one made-up one about pirate ships, and one real-life dataset that you added yourself. Now, let's see if we can use my code about the pirate ships to learn to write your own code about your data.
+
+```{r basic descriptives}
+ # Remember this code?
+names(capture)
+
+# Now, look at the names from your own dataset (type the code below):
+
+
+# Did it work? If so, great! If not, check that the proper uppercase/lowercase is applied, and make sure that inside the parentheses is the name you gave to your dataset above. 
+
+# Now that we know the names, let's find a variable we want to know more about. Let's say I'm most interested in treasure. How much treasure did these pirate ships have, exactly? I can get descriptive statistics on this like so:
+
+mean(capture$treasure) # I can use this code to find out the average amount of treasure (in kilos) the ships. What about the maximum and minimum amounts?
+
+max(capture$treasure)
+min(capture$treasure) # Try out these codes. Then, try the same codes on your own data below. Which of your variables is made up of numbers? Some of your likert scale items? Age? Try to find the mean response to a Likert scale or the mean age of your sample. Then, check the min and max scores. 
+
+# Notice that I used a $ in my code. That means, for the capture dataset, I want the mean/max/min of the treasure variable.
+
+# Did it work? Did you find out anything interesting? 
+
+
+# Now, let's see something else. What about data that aren't just numbers? What about categorical data, like where someone was from in Kara's dataset, or whether the person was at a 2- or 4-year college in Abby's? 
+
+# Well, I can find out how many people are in each category the same way I can find out how many ships the first mate had heard of before they were captured. I can make a table to see like this:
+table(capture$heardof) # 0 means the first mate hadn't heard of the ship, 1 means they had. (Notice that it doesn't tell me that, it just has a 0 and a 1. To find out which is which, I need a codebook to tell me. You can ask Qualtrics for a codebook by going to your survey and going to the Survey tab, tools, import/export survey, and export survey to Word. This will give you a word document with all your variable names and codes.) Now, try making a table with your data. Pick a variable with a few categories to see how many people were in each category. 
+
+
+
+# What are some other variables you can examine by making tables and getting the means, minimums, or maximums? What can you learn from this data? Here is some space to play around with some code:
+
+
+
+
+
+```
+And here is some space to type notes about what you learned about your dataset so far:
+
+
+
+
+
+
+
+
+
+
+
+
